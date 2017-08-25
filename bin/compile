@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -e
+unset GIT_DIR
+BUILD_DIR=$1
+BP_DIR=$(cd $(dirname ${0:-}); cd ..; pwd)
+
+# Stack version
+STACK_VERSION=1.5.0
+STACK_DOWNLOAD_URL=https://github.com/commercialhaskell/stack/releases/download/v$STACK_VERSION/stack-$STACK_VERSION-linux-x86_64.tar.gz
+
+# Download stack
+VENDORED_STACK="vendor/stack"
+PATH="$BUILD_DIR/$VENDORED_STACK:$PATH"
+mkdir -p "$BUILD_DIR/$VENDORED_STACK"
+curl -L $STACK_DOWNLOAD_URL | tar zx -C "${BUILD_DIR}/${VENDORED_STACK}" --wildcards '*/stack' --strip=1
+
+# Make stack available
+echo "export PATH=\"$BUILD_DIR/vendor/stack:\$PATH\"" > $BP_DIR/export
+stack setup
+echo "*** stack setup finishes ***"
